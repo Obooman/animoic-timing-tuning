@@ -80,6 +80,15 @@
 			block.style.top = clientY - oContainer.offsetTop - 10 + 'px';
 			block.value = counter++;
 
+			dots.push(p(
+				clientX - oContainer.offsetLeft - 10,
+				clientY - oContainer.offsetTop - 10
+			));
+
+			dots.sort(function(a,b){
+				return a.x-b.x;
+			})
+
 			draggable(block);
 			clickable(block);
 			deleteable(block);
