@@ -100,17 +100,31 @@
       return function BezierEasing(x) {
 
           if (mX1 === mY1 && mX2 === mY2) {
-              return x; // linear
+
+              return {
+                t:x,
+                y:x
+              }; // linear
           }
 
           if (x === 0) {
-              return 0;
+              return {
+                t:0,
+                y:0
+              };
           }
 
           if (x === 1) {
-              return 1;
+              return {
+                t:1,
+                y:1
+              };
           }
-          return calcBezier(getTForX(x), mY1, mY2);
+
+          return {
+            t:getTForX(x),
+            y:calcBezier(this.t, mY1, mY2)
+          }
       };
   };
 })(window);

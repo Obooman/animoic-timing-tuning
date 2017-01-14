@@ -10,10 +10,19 @@
         height: 400px;
         border: 1px solid black;
         margin: 100px auto;
+        position: relative;
     }
     
     .main-svg > path:hover {
         stroke: green;
+    }
+
+    .endPoint{
+    	width: 20px;
+    	height: 20px;
+    	background-color: green;
+    	position: absolute;
+    	transform: translate(-50%,-50%);
     }
     </style>
 </head>
@@ -26,11 +35,16 @@
     </div>
     <script src="libs/bezier-curve.js"></script>
     <script>
+    var oContainer = document.querySelector('.container');
     var oPath = document.querySelector('path');
     var oSvg = document.querySelector('svg');
 
     var endPoints = [];
     var bezierArr = [];
+
+    var {
+    	pow
+    } = Math;
 
     class Point {
         constructor(x, y) {
@@ -74,15 +88,24 @@
 
         calcWithT(t){
         	var {
-        		controllerOne,
-        		controllerTwo,
-        		startEnd,
-        		finishEnd
+        	    points:[
+        	    	left,right
+        	    ]
         	} = this;
 
         	return {
-        		x:this._getCoords(startEnd.x,controllerOne.x,controllerTwo.x,finishEnd.x,t),
-        		y:this._getCoords(startEnd.y,controllerOne.y,controllerTwo.y,finishEnd.y,t)
+        		x:this._getCoords(
+        			left.x,
+        			left.rightCtl.x,
+        			right.leftCtl.x,
+        			right.x,
+    			t),
+        		y:this._getCoords(
+        			left.y,
+        			left.rightCtl.y,
+        			right.leftCtl.y,
+        			right.y,
+        		t)
         	}
         }
 
@@ -91,11 +114,55 @@
         	// B(t) = P0(1-t)³ + 3P1t(1-t)² + 3P2t²(1-t) + P3t³
 
         	return (
-        		p0*Math.pow(1-t,3) + 
-        		p1*3*t*Math.pow(1-t,2) + 
-        		p2*3*Math.pow(t,2)*(1-t) + 
-        		p3*Math.pow(t,3)
+        		p0*pow(1-t,3) + 
+        		p1*3*t*pow(1-t,2) + 
+        		p2*3*pow(t,2)*(1-t) + 
+        		p3*pow(t,3)
         	)
+        }
+
+        getControls(t){
+        	return this._getControlPointForT(t);
+        }
+
+        _getControlPointForT(t){
+
+        	var {
+        		controllerOne,
+        		controllerTwo,
+        		startEnd,
+        		finishEnd
+        	} = this;
+
+        	var Q0 = new Point(
+        		startEnd.x + t*(controllerOne.x - startEnd.x),
+        		startEnd.y + t*(controllerOne.y - startEnd.y)
+    		);
+
+        	var Q1 = new Point(
+        		controllerOne.x + t*(controllerTwo.x - controllerOne.x),
+        		controllerOne.y + t*(controllerTwo.y - controllerOne.y)
+    		);
+
+        	var Q2 = new Point(
+        		controllerTwo.x + t*(finishEnd.x - controllerTwo.x),
+        		controllerTwo.y + t*(finishEnd.y - controllerTwo.y)
+    		);
+
+        	var A0 = new Controller(
+        		Q0.x + t*(Q1.x - Q0.x),
+        		Q0.y + t*(Q1.y - Q0.y)
+    		)
+
+        	var A1 = new Controller(
+        		Q1.x + t*(Q2.x - Q1.x),
+        		Q1.y + t*(Q2.y - Q1.y)
+        	)
+
+        	return {
+        		left:A0,
+        		right:A1
+        	}
         }
     }
 
@@ -143,34 +210,57 @@
 
     	// not sure which one bigger
     	var percentageY = Math.abs(finishEnd.y - startEnd.y);
-    	
+
     	var bezierFunc = bezier(
     		controllerOne.x/percentageX,
-    		controllerOne.y/percentageY,
+    		1 - controllerOne.y/percentageY,
     		controllerTwo.x/percentageX,
-    		controllerTwo.y/percentageY
+    		1 - controllerTwo.y/percentageY
 		)
 
 		var requestX = (x - startEnd.x)/percentageX;
 
-		var t = bezierFunc(requestX);
+		var t = bezierFunc(requestX).t;
+		var y = (1-bezierFunc(requestX).y)* 400;
 
 		var point = bezierObj.calcWithT(t);
 
-    	return new EndPoint(point.x,point.y,,);
+		var controls = bezierObj.getControls(t);
+
+    	return new EndPoint(
+    		x,
+    		y,
+    		controls.left,
+    		controls.right
+		);
     }
 
-    var a =  new Controller(0,400);
-    var b =  new Controller(0,400);
-    var c =  new Controller(400,0);
-    var d =  new Controller(400,0);
+    var startLeft = new Controller(0,400);
+    var startRight = new Controller(0,400);
 
-    var one = new EndPoint(0,400,a,b)
-    var two = new EndPoint(400,0,c,d)
+    var endLeft = new Controller(400,0);
+    var endRight = new Controller(400,0);
 
-    var bezierO  = new Bezier(one,two);
+    var start = new EndPoint(0,400,startLeft,startRight);
+    var end = new EndPoint(400,0,endLeft,endRight);
 
-    // console.log(getEndPointByGivenCubicBezierPointsAndTargetX(bezierO,200));
+    var totalBezier = new Bezier(start,end);
+
+    oPath.onmousemove = function({clientX}){
+    	var x = clientX - oContainer.offsetLeft;
+    	var extraEnd = getEndPointByGivenCubicBezierPointsAndTargetX(totalBezier,x);
+
+    	endPoints.push(extraEnd);
+
+    	var oDiv = document.createElement('div');
+    		oDiv.classList.add('endPoint')
+    		oDiv.setAttribute('tabindex','0');
+
+    		oDiv.style.left = extraEnd.x + 'px';
+    		oDiv.style.top = extraEnd.y + 'px';
+
+		oContainer.appendChild(oDiv);
+    }
     </script>
 </body>
 
