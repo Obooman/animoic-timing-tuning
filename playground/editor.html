@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+    .container {
+        width: 400px;
+        height: 400px;
+        border: 1px solid black;
+        margin: 100px auto;
+    }
+    
+    .main-svg > path:hover {
+        stroke: green;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <svg class="main-svg" width="400" height="400">
+            <path d="M0 400 C 0,400 400,0 400,0" stroke="blue" fill="none" stroke-width="10" line-cap="round" line-join="round"></path>
+        </svg>
+    </div>
+    <script src="libs/bezier-curve.js"></script>
+    <script>
+    var oPath = document.querySelector('path');
+    var oSvg = document.querySelector('svg');
+
+    var endPoints = [];
+    var bezierArr = [];
+
+    class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    class Bezier {
+        constructor(endPointOne,endPointTwo) {
+            this.points = [endPointOne,endPointTwo];
+
+            this.startEnd = endPointOne;
+            this.finishEnd = endPointTwo;
+
+            this.controllerOne = endPointOne.rightCtl;
+            this.controllerTwo = endPointTwo.leftCtl;
+        }
+
+        toString() {
+            var {
+                points:[
+                	left,right
+                ]
+            } = this;
+
+            return `C ${
+            	left.rightCtl.x
+            },${
+            	left.rightCtl.y
+            } ${
+            	right.leftCtl.x
+            },${
+            	right.leftCtl.y
+            } ${
+            	right.x
+            },${
+            	right.y
+            }`
+        }
+
+        calcWithT(t){
+        	var {
+        		controllerOne,
+        		controllerTwo,
+        		startEnd,
+        		finishEnd
+        	} = this;
+
+        	return {
+        		x:this._getCoords(startEnd.x,controllerOne.x,controllerTwo.x,finishEnd.x,t),
+        		y:this._getCoords(startEnd.y,controllerOne.y,controllerTwo.y,finishEnd.y,t)
+        	}
+        }
+
+        _getCoords(p0,p1,p2,p3,t){
+
+        	// B(t) = P0(1-t)³ + 3P1t(1-t)² + 3P2t²(1-t) + P3t³
+
+        	return (
+        		p0*Math.pow(1-t,3) + 
+        		p1*3*t*Math.pow(1-t,2) + 
+        		p2*3*Math.pow(t,2)*(1-t) + 
+        		p3*Math.pow(t,3)
+        	)
+        }
+    }
+
+    class EndPoint extends Point{
+
+    	constructor(x,y,leftCtl,rightCtl) {
+    		super(x,y);
+
+    		leftCtl.endPoint = this;
+    		rightCtl.endPoint = this;
+
+    		this.leftCtl = leftCtl
+    		this.rightCtl = rightCtl
+
+    		this.movable = true;
+    	}
+
+    	getDeltaX(){
+    		var {
+    			x,leftCtl,rightCtl
+    		} = this;
+
+    		return {
+    			left: x - leftCtl.x,
+    			right: rightCtrl - x
+    		}
+    	}
+    }
+
+    class Controller extends Point{
+    	constructor(x,y) {
+    		super(x,y);
+    	}
+    }
+
+    function getEndPointByGivenCubicBezierPointsAndTargetX(bezierObj,x){
+    	var {
+    		controllerOne,
+    		controllerTwo,
+    		startEnd,
+    		finishEnd
+    	} = bezierObj;
+
+    	var percentageX = finishEnd.x - startEnd.x;
+
+    	// not sure which one bigger
+    	var percentageY = Math.abs(finishEnd.y - startEnd.y);
+    	
+    	var bezierFunc = bezier(
+    		controllerOne.x/percentageX,
+    		controllerOne.y/percentageY,
+    		controllerTwo.x/percentageX,
+    		controllerTwo.y/percentageY
+		)
+
+		var requestX = (x - startEnd.x)/percentageX;
+
+		var t = bezierFunc(requestX);
+
+		var point = bezierObj.calcWithT(t);
+
+    	return new EndPoint(point.x,point.y,,);
+    }
+
+    var a =  new Controller(0,400);
+    var b =  new Controller(0,400);
+    var c =  new Controller(400,0);
+    var d =  new Controller(400,0);
+
+    var one = new EndPoint(0,400,a,b)
+    var two = new EndPoint(400,0,c,d)
+
+    var bezierO  = new Bezier(one,two);
+
+    // console.log(getEndPointByGivenCubicBezierPointsAndTargetX(bezierO,200));
+    </script>
+</body>
+
+</html>
