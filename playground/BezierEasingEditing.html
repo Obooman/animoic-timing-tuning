@@ -72,8 +72,8 @@
 		dots.push(p(200,0));
 
 		oPath.onclick = function({clientX,clientY}){
-			var block = document.createElement('input');
-			block.type = 'text';
+			var block = document.createElement('div');
+			block.setAttribute('tabindex','0');
 
 			block.classList.add('point');
 			block.style.left = clientX - oContainer.offsetLeft - 10 + 'px';
