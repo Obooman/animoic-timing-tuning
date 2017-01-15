@@ -59,7 +59,7 @@
 <body>
     <div class="container">
         <svg class="main-svg" width="400" height="400">
-            <path d="" stroke="#0170FF" fill="none" stroke-width="4" line-cap="round" line-join="round"></path>
+            <path d="M0,400C 0,400 400,0 400,0" stroke="#0170FF" fill="none" stroke-width="4" line-cap="round" line-join="round"></path>
         </svg>
     </div>
     <script src="libs/bezier-curve.js"></script>
@@ -131,8 +131,6 @@
     			extraEnd.leftCtl.y = extraEnd.y + extraEnd.leftCtl.deltaY;
 
     			rebuildEndPoints();
-
-    			console.log(extraEnd.previous.id);
     		}
 
     		document.onmouseup = function(){
@@ -148,12 +146,28 @@
     	oDiv.onfocus = function(){
     		
     	}
+
+    	oDiv.onkeyup = function({keyCode}){
+    		if( keyCode == 8 ){
+    			oDiv.remove();
+    			delete endPointHub[extraEnd.id];
+    			var index = endPoints.indexOf(extraEnd);
+
+    			if( index > 0 ){
+    				extraEnd = null;
+    				endPoints.splice(index,1);
+    				rebuildEndPoints();
+    			}
+    		}
+    	}
     }
 
     function rebuildEndPoints(){
     	var string = "M0,400";
 
     	endPoints.sort((former,latter) => former.x - latter.x);
+
+    	bezierArr = [];
 
     	endPoints.forEach(function(endPoint,index){
     		endPoint.previous = endPoints[index-1] || null;
