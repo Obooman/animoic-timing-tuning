@@ -8,21 +8,27 @@
     .container {
         width: 400px;
         height: 400px;
-        border: 1px solid black;
+        border: 2px solid #1D2538;
         margin: 100px auto;
         position: relative;
     }
     
     .main-svg > path:hover {
-        stroke: green;
+        stroke: #4AA876;
     }
 
     .endPoint{
     	width: 20px;
     	height: 20px;
-    	background-color: green;
+    	background-color: #4AA876;
+    	border-radius: 50%;
     	position: absolute;
     	transform: translate(-50%,-50%);
+    	outline: none;
+    }
+
+    .endPoint:focus{
+    	background-color: #FF7C13;
     }
     </style>
 </head>
@@ -30,7 +36,7 @@
 <body>
     <div class="container">
         <svg class="main-svg" width="400" height="400">
-            <path d="M0 400 C 0,400 400,0 400,0" stroke="blue" fill="none" stroke-width="10" line-cap="round" line-join="round"></path>
+            <path d="M0 400 C 0,400 400,0 400,0" stroke="#0170FF" fill="none" stroke-width="4" line-cap="round" line-join="round"></path>
         </svg>
     </div>
     <script src="libs/bezier-curve.js"></script>
@@ -246,7 +252,7 @@
 
     var totalBezier = new Bezier(start,end);
 
-    oPath.onmousemove = function({clientX}){
+    oPath.onclick = function({clientX}){
     	var x = clientX - oContainer.offsetLeft;
     	var extraEnd = getEndPointByGivenCubicBezierPointsAndTargetX(totalBezier,x);
 
@@ -261,6 +267,14 @@
 
 		oContainer.appendChild(oDiv);
     }
+
+    function getRndStr(){
+    	var str = "$_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var result = str.split('').sort(() => (Math.random() - 0.5));
+
+		return (result.join('')).substr(0,12);
+    }
+
     </script>
 </body>
 
