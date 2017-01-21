@@ -9,12 +9,16 @@ var bezierArr = [];
 // access endPoint by id;
 var endPointHub = {};
 
-var startRight = new Controller(0,400);
 
-var endLeft = new Controller(400,0);
+// define the globle scale size
+var size = 400;
 
-var start = new EndPoint(0,400,null,startRight);
-var end = new EndPoint(400,0,endLeft,null);
+var startRight = new Controller(0,size);
+
+var endLeft = new Controller(size,0);
+
+var start = new EndPoint(0,size,null,startRight);
+var end = new EndPoint(size,0,endLeft,null);
 
 var totalBezier = new Bezier(start,end);
 
@@ -51,7 +55,7 @@ function getEndPointByGivenCubicBezierPointsAndTargetX(bezierObj,x){
     var requestX = (x - startEnd.x)/percentageX;
 
     var t = bezierFunc(requestX).t;
-    var y = (1-bezierFunc(requestX).y)* 400;
+    var y = (1-bezierFunc(requestX).y)* size;
 
     var point = bezierObj.calcWithT(t);
 
