@@ -113,14 +113,14 @@
 		oDiv.appendChild(oRight);
 		oContainer.appendChild(oDiv);
 
-    	oDiv.onmousedown = function({clientX,clientY}){
+    	oDiv.addEventListener('mousedown',function({clientX,clientY}){
     		var disX = clientX - oDiv.offsetLeft;
     		var disY = clientY - oDiv.offsetTop;
 
     		document.onmousemove = function({clientX,clientY}){
     			var deltaX = clientX - disX;
     			var deltaY = clientY - disY;
-
+                
     			oDiv.style.left = deltaX + 'px';
     			oDiv.style.top = deltaY + 'px';
 
@@ -140,17 +140,19 @@
     			document.onmousemove = null;
     			document.onmouseup = null;
     		}
-    	}
+    	},false)
 
-    	oDiv.ondblclick = function(){
+    	oDiv.addEventListener('dblclick',function(){
+
+            // when dragging the point we are moving it or change the control point
     		this.classList.toggle('active');
-    	}
+    	},false)
 
-    	oDiv.onfocus = function(){
+    	oDiv.addEventListener('focus',function(){
     		
-    	}
+    	},false)
 
-    	oDiv.onkeyup = function({keyCode}){
+    	oDiv.addEventListener('keyup',function({keyCode}){
     		if( keyCode == 8 ){
     			oDiv.remove();
     			delete endPointHub[extraEnd.id];
@@ -162,7 +164,7 @@
     				rebuildEndPoints();
     			}
     		}
-    	}
+    	},false)
     }
 
     function rebuildEndPoints(){
