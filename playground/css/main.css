@@ -1,0 +1,52 @@
+.container {
+    width: 400px;
+    height: 400px;
+    border: 2px solid #1D2538;
+    margin: 100px auto;
+    position: relative;
+}
+
+.main-svg > path:hover {
+    stroke: #4AA876;
+}
+
+.endPoint{
+	width: 10px;
+	height: 10px;
+	background-color: #4AA876;
+	border-radius: 50%;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	outline: none;
+}
+
+.endPoint.active{
+	background: red;
+}
+
+.endPoint:focus{
+	background-color: #FF7C13;
+}
+
+.left-ctrl,.right-ctrl{
+	box-sizing: border-box;
+	border: 1px solid black;
+	
+	width: 8px;
+	height: 8px;
+
+	left: 50%;
+	top: 50%;
+
+	margin-left: -4px;
+	margin-top: -4px;
+
+	position: absolute;
+	background-color: red;
+	transform-origin:center;
+}
+
+.left-ctrl:focus,.right-ctrl:focus{
+	background-color: blue;
+	outline: none;
+}
