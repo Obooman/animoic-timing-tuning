@@ -26,14 +26,25 @@
     var oPath = document.querySelector('path');
     var oSvg = document.querySelector('svg');
 
-    oPath.onclick = function({clientX}){
+    oPath.addEventListener("click",function({clientX}){
 
     	var x = clientX - oContainer.offsetLeft;
+        var target;
 
-        var target = 
-            [...bezierArr].sort(
+        if( !bezierArr.length ){
+            target = totalBezier
+        } else {
+            var bezierSorted = [...bezierArr].sort(
                 (a,b) => a.points.x - b.points.x
-            )[0] || totalBezier;
+            );
+
+            for( var i = 0; i< bezierArr.length;i++ ){
+                if( x > bezierArr[i].startEnd.x ){
+                    target = bezierArr[i];
+                    break;
+                }
+            }
+        }
 
     	var extraEnd = getEndPointByGivenCubicBezierPointsAndTargetX(
             target,x - target.points[0].x
@@ -44,7 +55,7 @@
 		elementFactory(extraEnd);
 
 		endPointHub[extraEnd.id] = extraEnd;
-    }
+    },false);
 
     function elementFactory(extraEnd){
 
