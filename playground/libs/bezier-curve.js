@@ -121,9 +121,11 @@
               };
           }
 
+          var t = getTForX(x);
+
           return {
-            t:getTForX(x),
-            y:calcBezier(this.t, mY1, mY2)
+            t:t,
+            y:calcBezier(t, mY1, mY2)
           }
       };
   };
