@@ -40,31 +40,32 @@ function getEndPointByGivenCubicBezierPointsAndTargetX(bezierObj,x){
         finishEnd
     } = bezierObj;
 
-    var percentageX = finishEnd.x - startEnd.x;
+    // the scale of current bezier curve
+    var deltaX = finishEnd.x - startEnd.x;
+    var deltaY = Math.abs(startEnd.y - finishEnd.y);
 
     // not sure which one bigger
-    var percentageY = Math.abs(startEnd.y - finishEnd.y);
+    // var percentageY = Math.abs(startEnd.y - finishEnd.y);
 
     var bezierFunc = bezier(
-        controllerOne.x/percentageX,
-        (size - controllerOne.y)/percentageY,
-        controllerTwo.x/percentageX,
-        (size - controllerTwo.y)/percentageY
+        (controllerOne.x - startEnd.x)/deltaX,
+        (deltaY - (controllerOne.y - startEnd.y))/deltaY,
+        (controllerTwo.x - startEnd.x)/deltaX,
+        (deltaY - (controllerTwo.y - startEnd.y))/deltaY
     )
 
-    var requestX = (x - startEnd.x)/percentageX;
+    var requestX = (x - startEnd.x)/deltaX;
     var result = bezierFunc(requestX);
 
     var t = result.t;
-    var y = (1-result.y)* size;
 
     var point = bezierObj.calcWithT(t);
 
     var controls = bezierObj.getControls(t);
 
     return new EndPoint(
-        x,
-        y,
+        point.x,
+        point.y,
         controls.left,
         controls.right
     );

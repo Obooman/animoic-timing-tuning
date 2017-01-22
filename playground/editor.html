@@ -39,8 +39,8 @@
             );
 
             for( var i = 0; i< bezierArr.length;i++ ){
-                if( x > bezierArr[i].startEnd.x ){
-                    target = bezierArr[i];
+                if( x < bezierArr[i].startEnd.x ){
+                    target = bezierArr[i-1];
                     break;
                 }
             }
@@ -90,6 +90,13 @@
     		document.onmousemove = function({clientX,clientY}){
     			var deltaX = clientX - disX;
     			var deltaY = clientY - disY;
+
+                if( 
+                    deltaX + extraEnd.leftCtl.deltaX < extraEnd.previous.x ||
+                    deltaX + extraEnd.rightCtl.deltaX > extraEnd.next.x
+                ){
+                    return;
+                }
 
     			oDiv.style.left = deltaX + 'px';
     			oDiv.style.top = deltaY + 'px';
